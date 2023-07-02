@@ -1,0 +1,27 @@
+[
+    {
+      "name": "Liji",
+      "password": "Liji@123",
+      "privilege": "admin"
+    },
+    {
+      "name": "Arya",
+      "password": "Arya@123",
+      "privilege": "moderator"
+    },
+    {
+      "name": "Lekshmi",
+      "password": "Lekshmi@123",
+      "privilege": "moderator"
+    },
+    {
+      "name": "Athul",
+      "password": "Athul@123",
+      "privilege": "moderator"
+    },
+    {
+      "name": "Architecture",
+      "password": "Architecture@123",
+      "privilege": "moderator"
+    }
+  ]
