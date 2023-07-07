@@ -100,8 +100,7 @@ public class Login {
         for(Faculty faculty : facultyList){
             if(faculty.getName().equals(selectedName) && faculty.getPassword().equals(password)){
                 System.out.println("Login Succesfull. :)");
-                //can new TimeTable and pass the privilege
-                //dispose current frame
+                //call new TimeTable and pass the privilege
                 new Timetable(selectedName, faculty.getPrivilege());
                 frame.dispose();
                 return;
