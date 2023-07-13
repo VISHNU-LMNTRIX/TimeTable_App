@@ -5,6 +5,7 @@
         "lib/**/*.jar",
         "/home/vishnu/Documents/Learn/Java/Library/Jackson/jackson-annotations-2.15.2.jar",
         "/home/vishnu/Documents/Learn/Java/Library/Jackson/jackson-core-2.15.2.jar",
-        "/home/vishnu/Documents/Learn/Java/Library/Jackson/jackson-databind-2.15.2.jar"
+        "/home/vishnu/Documents/Learn/Java/Library/Jackson/jackson-databind-2.15.2.jar",
+        "/home/vishnu/Documents/Learn/Java/Library/Jackson/jackson-datatype-jsr310-2.15.2.jar"
     ]
 }

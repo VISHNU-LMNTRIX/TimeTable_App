@@ -195,6 +195,19 @@ public class Timetable {
             cardLayoutObject.show(calendarPanel, "dayPanel");
         });
 
+        //-------Footer Buttons
+        bookSlotBtn.addActionListener(e -> {
+            new BookSlot(frame);
+        });
+
+        updateSlotBtn.addActionListener(e -> {
+            new UpdateSlot(frame);
+        });
+
+        deleteSlotBtn.addActionListener(e -> {
+            new DeleteSlot(frame);
+        });
+
         // Add components to frame
         frame.setJMenuBar(menuBar);
         frame.add(mainPanel,BorderLayout.CENTER);
