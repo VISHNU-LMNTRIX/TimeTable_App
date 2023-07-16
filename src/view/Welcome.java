@@ -29,7 +29,7 @@ public class Welcome {
         // Action Listener for the studentButton
         studentButton.addActionListener(e -> {
             System.out.println("Student logged in.");
-            new Timetable(null, null);
+            new Timetable("Student", "none");
             frame.dispose();
         });
 

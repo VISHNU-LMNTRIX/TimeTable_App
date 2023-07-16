@@ -22,10 +22,4 @@
   "date" : "2023-07-15",
   "startTime" : [ 9, 0 ],
   "endTime" : [ 11, 0 ]
-}, {
-  "facultyName" : "Lekshmi",
-  "subject" : "Data Structures and Algorithms",
-  "date" : "2023-07-22",
-  "startTime" : [ 11, 0 ],
-  "endTime" : [ 13, 0 ]
-} ]
+}]

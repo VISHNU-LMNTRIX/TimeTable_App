@@ -26,6 +26,8 @@ public class Timetable {
     JPanel monthViewMainPanel;
     JPanel monthViewPanelDays;
     JPanel monthViewHeadingPanel;
+    static JComboBox<String> monthComboBox;
+    static JComboBox<Integer> yearComboBox;
 
     Timetable(String name,String privilege){
         JFrame frame = new JFrame();
@@ -87,6 +89,7 @@ public class Timetable {
         calendarPanel.add(monthPanel, "monthPanel");
         // default view of calendarPanel
         cardLayoutObject.show(calendarPanel, "monthPanel");
+        mainPanel.add(calendarPanel,BorderLayout.CENTER);
 
         //monthPanel
         monthViewHeadingPanel = new JPanel(); // Holds the heading (like "July 2023") and date chooser.
@@ -119,41 +122,50 @@ public class Timetable {
         monthViewMainPanel.add(monthViewPanelWeeks, BorderLayout.NORTH);
         monthViewMainPanel.add(monthViewPanelDays, BorderLayout.CENTER);
 
-        //-----------------------------------------------
-        //-------Footer Panel
+        if (privilege.equals("admin") || privilege.equals("moderator")) {
+            //-------Footer Panel
+            JPanel footerPanel = new JPanel();
+            footerPanel.setPreferredSize(new Dimension(800,35));
+            footerPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(200,200,200)));
+            footerPanel.setLayout(new GridLayout(1,3));
+            JPanel bookSlotPanel = new JPanel();
+            JPanel updateSlotPanel = new JPanel();
+            JPanel deleteSlotPanel = new JPanel();
+            JPanel[] footerPanels = {bookSlotPanel, updateSlotPanel, deleteSlotPanel};
+            JButton bookSlotBtn = new JButton("Book Slot");
+            JButton updateSlotBtn = new JButton("Update Slot");
+            JButton deleteSlotBtn = new JButton("Delete Slot");
+            JButton[] footerButtons = {bookSlotBtn, updateSlotBtn, deleteSlotBtn};
 
-        JPanel footerPanel = new JPanel();
-        footerPanel.setPreferredSize(new Dimension(800,35));
-        footerPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(200,200,200)));
-        footerPanel.setLayout(new GridLayout(1,3));
-        JPanel bookSlotPanel = new JPanel();
-        JPanel updateSlotPanel = new JPanel();
-        JPanel deleteSlotPanel = new JPanel();
-        JPanel[] footerPanels = {bookSlotPanel, updateSlotPanel, deleteSlotPanel};
-        JButton bookSlotBtn = new JButton("Book Slot");
-        JButton updateSlotBtn = new JButton("Update Slot");
-        JButton deleteSlotBtn = new JButton("Delete Slot");
-        JButton[] footerButtons = {bookSlotBtn, updateSlotBtn, deleteSlotBtn};
+            for(JPanel footerSubPanel : footerPanels)
+            {
+                footerSubPanel.setBackground(new Color(240,240,240));
+                footerPanel.add(footerSubPanel);
+            }
 
-        for(JPanel footerSubPanel : footerPanels)
-        {
-            footerSubPanel.setBackground(new Color(240,240,240));
-            footerPanel.add(footerSubPanel);
+            for(JButton footerButton : footerButtons)
+            {
+                footerButton.setFocusable(false);
+            }
+
+            bookSlotPanel.add(bookSlotBtn);
+            updateSlotPanel.add(updateSlotBtn);
+            deleteSlotPanel.add(deleteSlotBtn);
+            mainPanel.add(footerPanel,BorderLayout.SOUTH);
+
+            //Event Listeners for Footer Buttons
+            bookSlotBtn.addActionListener(e -> {
+                new BookSlot(frame, name, privilege);
+            });
+
+            updateSlotBtn.addActionListener(e -> {
+                new UpdateSlot(frame, name, privilege);
+            });
+
+            deleteSlotBtn.addActionListener(e -> {
+                new DeleteSlot(frame, name, privilege);
+            });
         }
-
-        for(JButton footerButton : footerButtons)
-        {
-            footerButton.setFocusable(false);
-        }
-
-        bookSlotPanel.add(bookSlotBtn);
-        updateSlotPanel.add(updateSlotBtn);
-        deleteSlotPanel.add(deleteSlotBtn);
-
-        //-----------------------------------------------
-
-        mainPanel.add(calendarPanel,BorderLayout.CENTER);
-        mainPanel.add(footerPanel,BorderLayout.SOUTH);
 
         // SidePanel ========================================================>
 
@@ -195,19 +207,6 @@ public class Timetable {
             cardLayoutObject.show(calendarPanel, "dayPanel");
         });
 
-        //-------Footer Buttons
-        bookSlotBtn.addActionListener(e -> {
-            new BookSlot(frame);
-        });
-
-        updateSlotBtn.addActionListener(e -> {
-            new UpdateSlot(frame);
-        });
-
-        deleteSlotBtn.addActionListener(e -> {
-            new DeleteSlot(frame);
-        });
-
         // Add components to frame
         frame.setJMenuBar(menuBar);
         frame.add(mainPanel,BorderLayout.CENTER);
@@ -235,8 +234,8 @@ public class Timetable {
         Integer[] years = {2021, 2022, 2023, 2024, 2025};
 
         JPanel monthYearChooser = new JPanel();
-        JComboBox<String> monthComboBox = new JComboBox<>(months);
-        JComboBox<Integer> yearComboBox = new JComboBox<>(years);
+        monthComboBox = new JComboBox<>(months);
+        yearComboBox = new JComboBox<>(years);
         String monthName = yearMonth.getMonth().name().toLowerCase();
         monthName = monthName.substring(0, 1).toUpperCase() + monthName.substring(1,3);
         monthComboBox.setSelectedItem(monthName);
@@ -291,5 +290,13 @@ public class Timetable {
         monthViewPanelDays.repaint();
 
     }
+
+    public static String getSelectedMonth() {
+        return (String)monthComboBox.getSelectedItem();
+    }
+
+    public static Integer getSelectedYear() {
+        return (Integer)yearComboBox.getSelectedItem();
+    } 
 
 }

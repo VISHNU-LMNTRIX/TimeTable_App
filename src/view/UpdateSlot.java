@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class UpdateSlot {
-    public UpdateSlot(JFrame parent){
+    public UpdateSlot(JFrame parent, String facultyName, String privilege){
         JDialog updateDialog = new JDialog(parent, "Update Slot", Dialog.ModalityType.APPLICATION_MODAL);
         updateDialog.setLayout(null);
         updateDialog.setSize(420,360);

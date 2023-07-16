@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class DeleteSlot {
-    public DeleteSlot(JFrame parent){
+    public DeleteSlot(JFrame parent, String facultyName, String privilege){
         JDialog deleteDialog = new JDialog(parent, "Delete Slot", Dialog.ModalityType.APPLICATION_MODAL);
         deleteDialog.setLayout(null);
         deleteDialog.setSize(400,265);
