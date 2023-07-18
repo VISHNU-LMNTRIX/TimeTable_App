@@ -16,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,6 @@ public class BookSlot {
         objectMapper.registerModule(new JavaTimeModule());
         try {
             bookingList = objectMapper.readValue(new File("src/data/bookings.json"), new TypeReference<List<BookingEntry>>() {});
-            System.out.println(bookingList);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("An error occured while accessing/reading the booking details.");
@@ -111,7 +111,7 @@ public class BookSlot {
         session.setBounds(70,110,70,25);
         bookDialog.add(session);
 
-        String[] sessions = {"Morning","Afternoon","Evening"};
+        String[] sessions = {"Forenoon","Afternoon","Evening"};
         sessionComboBox = new JComboBox<>(sessions);
         sessionComboBox.setBounds(155,110,175,25);
         bookDialog.add(sessionComboBox);
@@ -137,7 +137,7 @@ public class BookSlot {
         subject.setBounds(70,180,70,25);
         bookDialog.add(subject);
 
-        String[] subjects = {"Computer Architecture","Programming Paradigms","Data Structures and Algorithms","Computer Networks","Mathematical Foundations of CS"};
+        String[] subjects = {"Computer Architecture","Programming Paradigms","Data Structures & Algorithms","Computer Networks","Mathematical Foundns of CS"}; //Add new subjects within this array.
         JComboBox<String> subjectComboBox = new JComboBox<>(subjects);
         subjectComboBox.setBounds(155,180,175,25);
         bookDialog.add(subjectComboBox);
@@ -153,10 +153,15 @@ public class BookSlot {
 
         //Event Listeners
         submit.addActionListener(e -> {
-            bookingStatus.setText("Slot Booked Succesfully.");
             BookingManager bookingManager = new BookingManager();
             LocalDate bookingDate = LocalDate.of((Integer)yearComboBox.getSelectedItem(), monthComboBox.getSelectedIndex()+1, (Integer)dayComboBox.getSelectedItem());
-            bookingManager.createBookingEntry((String)nameComboBox.getSelectedItem(), (String)subjectComboBox.getSelectedItem(), bookingDate, LocalTime.of((Integer)startTimeComboBox.getSelectedItem(), 0), LocalTime.of((Integer)endTimeComboBox.getSelectedItem(), 0));
+
+            // Check if the selected slot is empty and is available for booking?? If so continue booking.
+
+            bookingManager.createBookingEntry((String)nameComboBox.getSelectedItem(), (String)subjectComboBox.getSelectedItem(), bookingDate, (String)sessionComboBox.getSelectedItem(), LocalTime.of((Integer)startTimeComboBox.getSelectedItem(), 0), LocalTime.of((Integer)endTimeComboBox.getSelectedItem(), 0));
+
+            // Show the option pane only after successfull booking.
+            JOptionPane.showMessageDialog(parent, "Slot Booked Succesfully", "Booking Status", JOptionPane.INFORMATION_MESSAGE);
         });
 
         monthComboBox.addActionListener(e -> {
@@ -217,3 +222,5 @@ public class BookSlot {
         }
     }
 }
+
+//Pending works: Check if the slot is empty for booking, if so book the slot and show "Booking Success" dialog box.

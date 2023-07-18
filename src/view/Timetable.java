@@ -10,6 +10,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import java.awt.Toolkit;
 import java.time.LocalDate;
@@ -155,15 +156,21 @@ public class Timetable {
 
             //Event Listeners for Footer Buttons
             bookSlotBtn.addActionListener(e -> {
-                new BookSlot(frame, name, privilege);
+                SwingUtilities.invokeLater(() -> {
+                    new BookSlot(frame, name, privilege);
+                });
             });
 
             updateSlotBtn.addActionListener(e -> {
-                new UpdateSlot(frame, name, privilege);
+                SwingUtilities.invokeLater(() -> {
+                    new UpdateSlot(frame, name, privilege);
+                });
             });
 
             deleteSlotBtn.addActionListener(e -> {
-                new DeleteSlot(frame, name, privilege);
+                SwingUtilities.invokeLater(() -> {
+                    new DeleteSlot(frame, name, privilege);
+                });
             });
         }
 
@@ -186,7 +193,9 @@ public class Timetable {
         //-------MenuBar
         fileMenuItemLogout.addActionListener(e -> {
             System.out.println("Successfully Logged out.");
-            new Welcome();
+            SwingUtilities.invokeLater(() -> {
+                new Welcome();
+            });
             frame.dispose();
         });
 

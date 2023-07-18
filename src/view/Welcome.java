@@ -5,6 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 public class Welcome {
     public Welcome(){
@@ -29,14 +30,18 @@ public class Welcome {
         // Action Listener for the studentButton
         studentButton.addActionListener(e -> {
             System.out.println("Student logged in.");
-            new Timetable("Student", "none");
+            SwingUtilities.invokeLater(() -> {
+                new Timetable("Student", "none");
+            });
             frame.dispose();
         });
 
         // Action Listener for the facultyButton
         facultyButton.addActionListener(e -> {
             System.out.println("Faculty trying to login...");
-            new Login();
+            SwingUtilities.invokeLater(() -> {
+                new Login();
+            });
             frame.dispose();
         });
 

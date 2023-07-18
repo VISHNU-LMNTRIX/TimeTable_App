@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
+import javax.swing.SwingUtilities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,7 +102,9 @@ public class Login {
             if(faculty.getName().equals(selectedName) && faculty.getPassword().equals(password)){
                 System.out.println("Login Succesfull. :)");
                 //call TimeTable and pass the name and privilege
-                new Timetable(selectedName, faculty.getPrivilege());
+                SwingUtilities.invokeLater(() -> {
+                    new Timetable(selectedName, faculty.getPrivilege());
+                });
                 frame.dispose();
                 return;
 
@@ -115,7 +118,9 @@ public class Login {
     }
 
     private void onBack(){
-        new Welcome();
+        SwingUtilities.invokeLater(() -> {
+            new Welcome();
+        });
         frame.dispose();
     }
 }

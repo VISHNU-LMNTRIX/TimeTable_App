@@ -12,6 +12,7 @@ public class BookingEntry {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
+    private String session;
     private LocalTime startTime;
     private LocalTime endTime;
 
@@ -19,10 +20,11 @@ public class BookingEntry {
         // Default constructor
     }
 
-    public BookingEntry(String facultyName, String subject, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    public BookingEntry(String facultyName, String subject, LocalDate date, String session, LocalTime startTime, LocalTime endTime) {
         this.facultyName = facultyName;
         this.subject = subject;
         this.date = date;
+        this.session = session;
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -51,6 +53,14 @@ public class BookingEntry {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getSession() {
+        return session;
+    }
+
+    public void setSession(String session) {
+        this.session = session;
     }
 
     public LocalTime getStartTime() {

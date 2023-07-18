@@ -21,8 +21,8 @@ public class BookingManager {
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 
-    public void createBookingEntry(String facultyName, String subject, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        BookingEntry bookingEntry = new BookingEntry(facultyName, subject, date, startTime, endTime);
+    public void createBookingEntry(String facultyName, String subject, LocalDate date, String session, LocalTime startTime, LocalTime endTime) {
+        BookingEntry bookingEntry = new BookingEntry(facultyName, subject, date, session, startTime, endTime);
         List<BookingEntry> bookings = readBookingsFromFile();
         bookings.add(bookingEntry);
         saveBookingsToFile(bookings);
