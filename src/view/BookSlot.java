@@ -1,9 +1,7 @@
 package view;
 
-import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,15 +32,16 @@ public class BookSlot {
     JComboBox<String> sessionComboBox;
     JComboBox<Integer> startTimeComboBox;
     JComboBox<Integer> endTimeComboBox;
+    JDialog bookDialog;
     JLabel bookingStatus;
+    List<BookingEntry> bookingList = new ArrayList<>();
 
     public BookSlot(JFrame parent, String facultyName, String privilege){
         //Placed at the top because the try catch block makes the variables local to them.
         List<Faculty> facultyList = new ArrayList<>();
-        List<BookingEntry> bookingList = new ArrayList<>();
 
         //Creating the Dialog box
-        JDialog bookDialog = new JDialog(parent, "Book Slot", Dialog.ModalityType.APPLICATION_MODAL);
+        bookDialog = new JDialog(parent, "Book Slot", Dialog.ModalityType.APPLICATION_MODAL);
         bookDialog.setLayout(null);
         bookDialog.setSize(400,335);
         bookDialog.setResizable(false);
@@ -51,7 +50,6 @@ public class BookSlot {
         try {
              facultyList = objectMapper.readValue(new File("src/data/login.json"), new TypeReference<List<Faculty>>() {});
         } catch (Exception e) {
-            
             e.printStackTrace();
             System.out.println("An error occured while accessing/reading the login details.");
         }
@@ -142,26 +140,23 @@ public class BookSlot {
         subjectComboBox.setBounds(155,180,175,25);
         bookDialog.add(subjectComboBox);
 
-        bookingStatus = new JLabel("");
-        bookingStatus.setBounds(128,210,150,25);
-        bookingStatus.setForeground(new Color(24, 130, 14));
-        bookDialog.add(bookingStatus);
-
         JButton submit = new JButton("Book");
         submit.setBounds(155,240,90,25);
         bookDialog.add(submit);
 
         //Event Listeners
         submit.addActionListener(e -> {
-            BookingManager bookingManager = new BookingManager();
             LocalDate bookingDate = LocalDate.of((Integer)yearComboBox.getSelectedItem(), monthComboBox.getSelectedIndex()+1, (Integer)dayComboBox.getSelectedItem());
 
-            // Check if the selected slot is empty and is available for booking?? If so continue booking.
+            BookingEntry bookingEntry = new BookingEntry((String)nameComboBox.getSelectedItem(), (String)subjectComboBox.getSelectedItem(), bookingDate, (String)sessionComboBox.getSelectedItem(), LocalTime.of((Integer)startTimeComboBox.getSelectedItem(), 0), LocalTime.of((Integer)endTimeComboBox.getSelectedItem(), 0));
 
-            bookingManager.createBookingEntry((String)nameComboBox.getSelectedItem(), (String)subjectComboBox.getSelectedItem(), bookingDate, (String)sessionComboBox.getSelectedItem(), LocalTime.of((Integer)startTimeComboBox.getSelectedItem(), 0), LocalTime.of((Integer)endTimeComboBox.getSelectedItem(), 0));
+            if(isSlotAvailable(bookingEntry, bookDialog)){
+                BookingManager bookingManager = new BookingManager();
+                bookingManager.createBookingEntry(bookingEntry);
 
-            // Show the option pane only after successfull booking.
-            JOptionPane.showMessageDialog(parent, "Slot Booked Succesfully", "Booking Status", JOptionPane.INFORMATION_MESSAGE);
+                // Show the option pane only after successfull booking.
+                JOptionPane.showMessageDialog(bookDialog, "Slot Booked Succesfully", "Booking Status", JOptionPane.INFORMATION_MESSAGE);
+            }
         });
 
         monthComboBox.addActionListener(e -> {
@@ -177,13 +172,28 @@ public class BookSlot {
         });
 
          // Calculate the center coordinates
-         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-         int centerX = (int) (screenSize.getWidth() - bookDialog.getWidth()) / 2;
-         int centerY = (int) (screenSize.getHeight() - bookDialog.getHeight()) / 2;
+        int centerX = parent.getX() + (parent.getWidth() - bookDialog.getWidth()) / 2;
+        int centerY = parent.getY() + (parent.getHeight() - bookDialog.getHeight()) / 2;
  
-         
          bookDialog.setLocation(centerX, centerY);  // Set the window location
          bookDialog.setVisible(true);
+    }
+
+    private boolean isSlotAvailable(BookingEntry newBooking, Component parent) {
+        for (BookingEntry booking : bookingList) {
+            // Check if the dates and sessions match
+            if (booking.getDate().equals(newBooking.getDate()) && booking.getSession().equals(newBooking.getSession())) {
+                // Check if there is any overlap in the time range
+                if (booking.getStartTime().isBefore(newBooking.getEndTime()) && booking.getEndTime().isAfter(newBooking.getStartTime())) {
+                    //Message to be displayed when slot is not available
+                    String message = "Sorry, The slot is already taken by " + booking.getFacultyName() + " From " + booking.getStartTime().toString() + " to " + booking.getEndTime().toString() + ".";
+
+                    JOptionPane.showMessageDialog(parent, message, "Booking Status", JOptionPane.ERROR_MESSAGE);
+                    return false; // Slot is not available
+                }
+            }
+        }
+        return true; // Slot is available
     }
 
     private void updateStartandEndTime() {
@@ -222,5 +232,3 @@ public class BookSlot {
         }
     }
 }
-
-//Pending works: Check if the slot is empty for booking, if so book the slot and show "Booking Success" dialog box.

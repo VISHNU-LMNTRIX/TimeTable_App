@@ -284,6 +284,7 @@ public class Timetable {
         }
 
         for (int i = 1; i <= numberOfDays; i++) {
+            //Fetch the booking data from bookings.json and display it on the necessary dayPanel.
             JPanel dayPanel = new JPanel();
             JLabel dayLabel = new JLabel(Integer.toString(i));
             dayPanel.setBackground(Color.WHITE);

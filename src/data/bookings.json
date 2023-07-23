@@ -6,13 +6,6 @@
   "startTime" : [ 7, 0 ],
   "endTime" : [ 9, 0 ]
 }, {
-  "facultyName" : "Liji",
-  "subject" : "Computer Architecture",
-  "date" : "2023-07-15",
-  "session" : "Forenoon",
-  "startTime" : [ 9, 0 ],
-  "endTime" : [ 11, 0 ]
-}, {
   "facultyName" : "Arya",
   "subject" : "Computer Networks",
   "date" : "2023-07-18",
@@ -26,4 +19,11 @@
   "session" : "Afternoon",
   "startTime" : [ 2, 0 ],
   "endTime" : [ 5, 0 ]
+}, {
+  "facultyName" : "Liji",
+  "subject" : "Computer Architecture",
+  "date" : "2023-07-22",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 12, 0 ]
 } ]

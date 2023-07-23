@@ -35,6 +35,7 @@ public class DeleteSlot {
     JComboBox<String> dateComboBox;
     JComboBox<String> timeComboBox;
     ObjectMapper objectMapper;
+    JDialog deleteDialog;
     List<BookingEntry> bookingList = new ArrayList<>();
     BookingManager bookingManager = new BookingManager();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
@@ -44,7 +45,7 @@ public class DeleteSlot {
         List<Faculty> facultyList = new ArrayList<>();
 
         //Creating the Dialog box
-        JDialog deleteDialog = new JDialog(parent, "Delete Slot", Dialog.ModalityType.APPLICATION_MODAL);
+        deleteDialog = new JDialog(parent, "Delete Slot", Dialog.ModalityType.APPLICATION_MODAL);
         deleteDialog.setLayout(null);
         deleteDialog.setSize(400,265);
         deleteDialog.setResizable(false);
@@ -112,18 +113,24 @@ public class DeleteSlot {
         });
 
         submit.addActionListener(e -> {
-            JOptionPane.showMessageDialog(parent, "Slot Deleted Succesfully", "Deletion Status", JOptionPane.INFORMATION_MESSAGE);
+            //If there are no slots booked
+            if((String)dateComboBox.getSelectedItem() == null){
+                JOptionPane.showMessageDialog(deleteDialog, "The Slot Is Already Empty.", "Deletion Status", JOptionPane.WARNING_MESSAGE);
+            }
+            else {
+                JOptionPane.showMessageDialog(deleteDialog, "Slot Deleted Succesfully", "Deletion Status", JOptionPane.INFORMATION_MESSAGE);
 
-            //StringTokenizer is used to seperate the time from the string obtained from timeComboBox, which contains string like "09:00 to 10:00" .The seperated strings can be accessed using .nextToken() method.
-            StringTokenizer timeString = new StringTokenizer((String)timeComboBox.getSelectedItem()," to ");
-            LocalTime startTime = LocalTime.parse(timeString.nextToken());
-            LocalTime endTime = LocalTime.parse(timeString.nextToken());
+                //StringTokenizer is used to seperate the time from the string obtained from timeComboBox, which contains string like "09:00 to 10:00" .The seperated strings can be accessed using .nextToken() method.
+                StringTokenizer timeString = new StringTokenizer((String)timeComboBox.getSelectedItem()," to ");
+                LocalTime startTime = LocalTime.parse(timeString.nextToken());
+                LocalTime endTime = LocalTime.parse(timeString.nextToken());
 
-            bookingManager.deleteBookingEntry((String)nameComboBox.getSelectedItem(), LocalDate.parse((String)dateComboBox.getSelectedItem(), formatter), startTime, endTime);
+                bookingManager.deleteBookingEntry((String)nameComboBox.getSelectedItem(), LocalDate.parse((String)dateComboBox.getSelectedItem(), formatter), startTime, endTime);
 
-            readBookingData();
-            updateDateComboBox();
-            updateTimeComboBox();
+                readBookingData();
+                updateDateComboBox();
+                updateTimeComboBox();
+            }
         });
 
          // Calculate the center coordinates
