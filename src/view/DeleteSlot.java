@@ -28,6 +28,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import core.BookingEntry;
 import core.BookingManager;
 import core.Faculty;
+import core.JsonUpdateListener;
 
 public class DeleteSlot {
     //Global Identifers
@@ -40,7 +41,7 @@ public class DeleteSlot {
     BookingManager bookingManager = new BookingManager();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
-    public DeleteSlot(JFrame parent, String facultyName, String privilege){
+    public DeleteSlot(JFrame parent, String facultyName, String privilege, JsonUpdateListener callback){
         //Placed at the top because the try catch block makes the variables local to them.
         List<Faculty> facultyList = new ArrayList<>();
 
@@ -60,9 +61,9 @@ public class DeleteSlot {
             System.out.println("An error occurred while accessing/reading the login details.");
         }
 
-
+        // objectMapper is registered with new JavaTimeModule() to handle LocalTime/LocalDate serialization and deserialization, when accessing bookings.json file.
         objectMapper.registerModule(new JavaTimeModule());
-        readBookingData(); //Function to read "bookings.json" file.
+        bookingList = bookingManager.readBookingData(); // Read the booking data from bookings.json
         
         // Add the components
         JLabel name = new JLabel("Name :");
@@ -118,8 +119,6 @@ public class DeleteSlot {
                 JOptionPane.showMessageDialog(deleteDialog, "The Slot Is Already Empty.", "Deletion Status", JOptionPane.WARNING_MESSAGE);
             }
             else {
-                JOptionPane.showMessageDialog(deleteDialog, "Slot Deleted Succesfully", "Deletion Status", JOptionPane.INFORMATION_MESSAGE);
-
                 //StringTokenizer is used to seperate the time from the string obtained from timeComboBox, which contains string like "09:00 to 10:00" .The seperated strings can be accessed using .nextToken() method.
                 StringTokenizer timeString = new StringTokenizer((String)timeComboBox.getSelectedItem()," to ");
                 LocalTime startTime = LocalTime.parse(timeString.nextToken());
@@ -127,9 +126,12 @@ public class DeleteSlot {
 
                 bookingManager.deleteBookingEntry((String)nameComboBox.getSelectedItem(), LocalDate.parse((String)dateComboBox.getSelectedItem(), formatter), startTime, endTime);
 
-                readBookingData();
+                bookingList = bookingManager.readBookingData();
                 updateDateComboBox();
                 updateTimeComboBox();
+                callback.updateCalendarView(); //Updates the calendar view after deleting a slot
+                
+                JOptionPane.showMessageDialog(deleteDialog, "Slot Deleted Succesfully", "Deletion Status", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -140,17 +142,6 @@ public class DeleteSlot {
  
          deleteDialog.setLocation(centerX, centerY);  // Set the window location
          deleteDialog.setVisible(true);
-    }
-
-    private void readBookingData() {
-        try (FileInputStream fileInputStream = new FileInputStream("src/data/bookings.json"); 
-        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream); 
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-            bookingList = objectMapper.readValue(bufferedReader, new TypeReference<List<BookingEntry>>(){});
-        } catch(IOException e) {
-            e.printStackTrace();
-            System.out.println("An error occured while accessing/reading the booking details.");
-        }
     }
 
     private void updateDateComboBox() {

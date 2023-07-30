@@ -2,7 +2,10 @@ package view;
 
 import java.awt.Component;
 import java.awt.Dialog;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -23,6 +26,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import core.BookingEntry;
 import core.BookingManager;
 import core.Faculty;
+import core.JsonUpdateListener;
 
 public class BookSlot {
     //Global Identifiers
@@ -32,11 +36,13 @@ public class BookSlot {
     JComboBox<String> sessionComboBox;
     JComboBox<Integer> startTimeComboBox;
     JComboBox<Integer> endTimeComboBox;
+    ObjectMapper objectMapper;
     JDialog bookDialog;
     JLabel bookingStatus;
     List<BookingEntry> bookingList = new ArrayList<>();
+    BookingManager bookingManager = new BookingManager();
 
-    public BookSlot(JFrame parent, String facultyName, String privilege){
+    public BookSlot(JFrame parent, String facultyName, String privilege, JsonUpdateListener callback){
         //Placed at the top because the try catch block makes the variables local to them.
         List<Faculty> facultyList = new ArrayList<>();
 
@@ -46,21 +52,18 @@ public class BookSlot {
         bookDialog.setSize(400,335);
         bookDialog.setResizable(false);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-             facultyList = objectMapper.readValue(new File("src/data/login.json"), new TypeReference<List<Faculty>>() {});
-        } catch (Exception e) {
+        objectMapper = new ObjectMapper();
+        try (FileInputStream fileInputStream = new FileInputStream("src/data/login.json"); 
+        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream); 
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            facultyList = objectMapper.readValue(bufferedReader, new TypeReference<List<Faculty>>(){});
+        } catch(IOException e) {
             e.printStackTrace();
-            System.out.println("An error occured while accessing/reading the login details.");
+            System.out.println("An error occurred while accessing/reading the login details.");
         }
 
+        // objectMapper is registered with new JavaTimeModule() to handle LocalTime/LocalDate serialization and deserialization, when accessing bookings.json file.
         objectMapper.registerModule(new JavaTimeModule());
-        try {
-            bookingList = objectMapper.readValue(new File("src/data/bookings.json"), new TypeReference<List<BookingEntry>>() {});
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("An error occured while accessing/reading the booking details.");
-        }
 
         // Add the components
         JLabel name = new JLabel("Name :");
@@ -153,6 +156,7 @@ public class BookSlot {
             if(isSlotAvailable(bookingEntry, bookDialog)){
                 BookingManager bookingManager = new BookingManager();
                 bookingManager.createBookingEntry(bookingEntry);
+                callback.updateCalendarView();
 
                 // Show the option pane only after successfull booking.
                 JOptionPane.showMessageDialog(bookDialog, "Slot Booked Succesfully", "Booking Status", JOptionPane.INFORMATION_MESSAGE);
@@ -180,6 +184,8 @@ public class BookSlot {
     }
 
     private boolean isSlotAvailable(BookingEntry newBooking, Component parent) {
+        bookingList = bookingManager.readBookingData();
+        
         for (BookingEntry booking : bookingList) {
             // Check if the dates and sessions match
             if (booking.getDate().equals(newBooking.getDate()) && booking.getSession().equals(newBooking.getSession())) {

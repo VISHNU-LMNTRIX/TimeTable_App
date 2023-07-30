@@ -51,7 +51,7 @@ public class Welcome {
         int centerY = (int) (screenSize.getHeight() - frame.getHeight()) / 2;
 
         
-        frame.setLocation(centerX, centerY);    // Set the window location
+        frame.setLocation(centerX, centerY); // Set the window location
         frame.setVisible(true);
     }
     

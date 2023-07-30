@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ public class BookingManager {
 
     public BookingManager() {
         this.objectMapper = new ObjectMapper();
+        // objectMapper is registered with new JavaTimeModule() to handle LocalTime/LocalDate serialization and deserialization, when accessing bookings.json file.
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 
@@ -85,6 +89,20 @@ public class BookingManager {
             objectMapper.writeValue(new File(FILE_PATH), bookings);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public List<BookingEntry> readBookingData() {
+        List<BookingEntry> bookingList = new ArrayList<>();
+        try (FileInputStream fileInputStream = new FileInputStream("src/data/bookings.json"); 
+        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream); 
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            bookingList = objectMapper.readValue(bufferedReader, new TypeReference<List<BookingEntry>>(){});
+            return bookingList;
+        } catch(IOException e) {
+            e.printStackTrace();
+            System.out.println("An error occured while accessing/reading the booking details.");
+            return bookingList;
         }
     }
 }

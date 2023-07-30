@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -12,29 +13,49 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import core.BookingEntry;
+import core.BookingManager;
+import core.JsonUpdateListener;
+
 import java.awt.Toolkit;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 
-public class Timetable {
+public class Timetable implements JsonUpdateListener{
     //Global identifiers
     JPanel monthViewMainPanel;
     JPanel monthViewPanelDays;
     JPanel monthViewHeadingPanel;
     static JComboBox<String> monthComboBox;
     static JComboBox<Integer> yearComboBox;
+    BookingManager bookingManager = new BookingManager();
+    List<BookingEntry> bookingList = new ArrayList<>();
+    private final Map<String, String> subjectShortNames = new HashMap<>();
 
     Timetable(String name,String privilege){
         JFrame frame = new JFrame();
         frame.setTitle("TimeTable 2023 by Vishnu and Drushti");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1100,650);
+
+        //Initialize the subjectShortNames here:
+        subjectShortNames.put("Computer Networks", "CN");
+        subjectShortNames.put("Programming Paradigms", "PP");
+        subjectShortNames.put("Computer Architecture", "CA");
+        subjectShortNames.put("Mathematical Foundations of CS", "MF");
+        subjectShortNames.put("Data Structures & Algorithms", "DS");
 
         // MenuBar =========================================================>
 
@@ -118,13 +139,14 @@ public class Timetable {
 
         monthViewPanelDays = new JPanel(); // Holds the total days of the month.
         monthViewPanelDays.setLayout(new GridLayout(0, 7));
-        updateMonthCalendar(LocalDate.now());
+        updateMonthPanel(LocalDate.now());
 
         monthViewMainPanel.add(monthViewPanelWeeks, BorderLayout.NORTH);
         monthViewMainPanel.add(monthViewPanelDays, BorderLayout.CENTER);
 
+        // FooterPanel ========================================================>
+        
         if (privilege.equals("admin") || privilege.equals("moderator")) {
-            //-------Footer Panel
             JPanel footerPanel = new JPanel();
             footerPanel.setPreferredSize(new Dimension(800,35));
             footerPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(200,200,200)));
@@ -157,7 +179,7 @@ public class Timetable {
             //Event Listeners for Footer Buttons
             bookSlotBtn.addActionListener(e -> {
                 SwingUtilities.invokeLater(() -> {
-                    new BookSlot(frame, name, privilege);
+                    new BookSlot(frame, name, privilege, this);
                 });
             });
 
@@ -169,7 +191,7 @@ public class Timetable {
 
             deleteSlotBtn.addActionListener(e -> {
                 SwingUtilities.invokeLater(() -> {
-                    new DeleteSlot(frame, name, privilege);
+                    new DeleteSlot(frame, name, privilege, this);
                 });
             });
         }
@@ -224,10 +246,18 @@ public class Timetable {
         frame.setVisible(true);
     }
 
-    private void updateMonthCalendar(LocalDate date) {
+    private void updateMonthPanel(LocalDate date) {
         YearMonth yearMonth = YearMonth.from(date);
 
-        // MonthView Heading Panel -------------------------------------------
+        // Updates the heading panel of month view.
+        updateMonthViewHeadingPanel(yearMonth);
+
+        // Updates the day panels of the month view.
+        updateMonthViewDaysPanel(yearMonth);
+    }
+
+    // Function to update the heading panel of month view.
+    private void updateMonthViewHeadingPanel(YearMonth yearMonth) {
         monthViewHeadingPanel.removeAll();
         monthViewHeadingPanel.setLayout(new BorderLayout());
 
@@ -260,22 +290,27 @@ public class Timetable {
         // Event Listeners
         monthComboBox.addActionListener(e -> {
             LocalDate newDate = LocalDate.of((int)yearComboBox.getSelectedItem(),monthComboBox.getSelectedIndex()+1,1);
-            updateMonthCalendar(newDate);
+            updateMonthPanel(newDate);
         });
 
         yearComboBox.addActionListener(e -> {
             LocalDate newDate = LocalDate.of((int)yearComboBox.getSelectedItem(),monthComboBox.getSelectedIndex()+1,1);
-            updateMonthCalendar(newDate);
+            updateMonthPanel(newDate);
         });
+    }
 
-        //--------------------------------------------------------------------
-
+    // Function to update the day panels of the month view.
+    private void updateMonthViewDaysPanel(YearMonth yearMonth) {
         LocalDate firstDayOfMonth = yearMonth.atDay(1);
         int startDayOfWeek = firstDayOfMonth.getDayOfWeek().getValue();
         int numberOfDays = yearMonth.lengthOfMonth();
 
         monthViewPanelDays.removeAll();
         monthViewPanelDays.setBackground(Color.WHITE);
+
+        // Read the booking data from bookings.json
+        bookingList = bookingManager.readBookingData();
+
         // If startDayOfWeek is Sunday, Empty label not required.
         if(startDayOfWeek != 7){
             for (int i = 1; i <= startDayOfWeek; i++) {
@@ -284,21 +319,83 @@ public class Timetable {
         }
 
         for (int i = 1; i <= numberOfDays; i++) {
-            //Fetch the booking data from bookings.json and display it on the necessary dayPanel.
             JPanel dayPanel = new JPanel();
+            dayPanel.setLayout(new BorderLayout());
+
+            JPanel dayLabelPanel = new JPanel(); // Holds the day number.
+            dayLabelPanel.setBackground(Color.WHITE);
             JLabel dayLabel = new JLabel(Integer.toString(i));
-            dayPanel.setBackground(Color.WHITE);
-            if (yearMonth.getMonthValue() == LocalDate.now().getMonthValue() && i == LocalDate.now().getDayOfMonth()) {
+            dayLabelPanel.add(dayLabel);
+
+            //new code starts here
+            JPanel dayEventsPanel = new JPanel(); // Holds the event details
+            dayEventsPanel.setLayout(new BoxLayout(dayEventsPanel, BoxLayout.Y_AXIS));
+
+            // Get the bookings for the current day
+            LocalDate currentDate = LocalDate.of(yearMonth.getYear(), yearMonth.getMonthValue(), i);
+            List<BookingEntry> bookingsForDay = getBookingsForDay(currentDate);
+
+            // Sort the bookings first by session (forenoon -> afternoon -> evening) and then by startTime
+            bookingsForDay.sort((b1, b2) -> {
+                String session1 = b1.getSession();
+                String session2 = b2.getSession();
+                int sessionOrder1 = getSessionOrder(session1);
+                int sessionOrder2 = getSessionOrder(session2);
+
+                if (sessionOrder1 != sessionOrder2) {
+                    return Integer.compare(sessionOrder1, sessionOrder2);
+                }
+
+                LocalTime startTime1 = b1.getStartTime();
+                LocalTime startTime2 = b2.getStartTime();
+                return startTime1.compareTo(startTime2);
+            });
+
+            for (BookingEntry booking : bookingsForDay) {
+                JPanel bookingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                //get the shortened code for the subject names
+                String subjectName = subjectShortNames.getOrDefault(booking.getSubject(), booking.getSubject());
+                bookingPanel.add(new JLabel(subjectName + " - " + booking.getStartTime().toString() + " - " + booking.getEndTime().toString()));
+                dayEventsPanel.add(bookingPanel);
+            }
+
+            if (yearMonth.getMonthValue() == LocalDate.now().getMonthValue() && i == LocalDate.now().getDayOfMonth() && yearMonth.getYear() == LocalDate.now().getYear()) {
                 dayLabel.setForeground(Color.RED);
                 dayPanel.setBackground(new Color(230,230,230));
             }
+
             dayPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(216,216,216)));
-            dayPanel.add(dayLabel);
+            dayPanel.add(dayLabelPanel, BorderLayout.NORTH);
+            dayPanel.add(dayEventsPanel, BorderLayout.CENTER);
             monthViewPanelDays.add(dayPanel);
         }
         monthViewPanelDays.revalidate();
         monthViewPanelDays.repaint();
+    }
 
+    // Method to get the bookings for a specific day
+    private List<BookingEntry> getBookingsForDay(LocalDate date) {
+        List<BookingEntry> bookingsForDay = new ArrayList<>();
+        for (BookingEntry booking : bookingList) {
+            if (date.equals(booking.getDate())) {
+                bookingsForDay.add(booking);
+            }
+        }
+        return bookingsForDay;
+    }
+
+    // Method to determine the session order (forenoon: 1, afternoon: 2, evening: 3)
+    private int getSessionOrder(String session) {
+        switch (session) {
+            case "Forenoon":
+                return 1;
+            case "Afternoon":
+                return 2;
+            case "Evening":
+                return 3;
+            default:
+                return 0; // Use 0 for any other cases (to handle unexpected data)
+        }
     }
 
     public static String getSelectedMonth() {
@@ -307,6 +404,14 @@ public class Timetable {
 
     public static Integer getSelectedYear() {
         return (Integer)yearComboBox.getSelectedItem();
+    }
+
+    // Method used as a callback to update the calendar view after slot booking/deletion.
+    @Override
+    public void updateCalendarView() {
+        LocalDate newDate = LocalDate.of((int)yearComboBox.getSelectedItem(),monthComboBox.getSelectedIndex()+1,1);
+        YearMonth yearMonth = YearMonth.from(newDate);
+        updateMonthViewDaysPanel(yearMonth);
     } 
 
 }

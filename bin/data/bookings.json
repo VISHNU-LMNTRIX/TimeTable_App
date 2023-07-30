@@ -1,6 +1,6 @@
 [ {
   "facultyName" : "Lekshmi",
-  "subject" : "Data Structures and Algorithms",
+  "subject" : "Data Structures & Algorithms",
   "date" : "2023-07-22",
   "session" : "Evening",
   "startTime" : [ 7, 0 ],
@@ -26,4 +26,60 @@
   "session" : "Forenoon",
   "startTime" : [ 9, 0 ],
   "endTime" : [ 12, 0 ]
+}, {
+  "facultyName" : "Liji",
+  "subject" : "Computer Networks",
+  "date" : "2023-07-27",
+  "session" : "Evening",
+  "startTime" : [ 7, 0 ],
+  "endTime" : [ 10, 0 ]
+}, {
+  "facultyName" : "Liji",
+  "subject" : "Computer Architecture",
+  "date" : "2023-07-31",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 11, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-07-31",
+  "session" : "Afternoon",
+  "startTime" : [ 2, 0 ],
+  "endTime" : [ 5, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-07-31",
+  "session" : "Evening",
+  "startTime" : [ 6, 0 ],
+  "endTime" : [ 7, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-07-31",
+  "session" : "Evening",
+  "startTime" : [ 7, 0 ],
+  "endTime" : [ 9, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-07-16",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 12, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-07-18",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 10, 0 ]
+}, {
+  "facultyName" : "Lekshmi",
+  "subject" : "Data Structures & Algorithms",
+  "date" : "2023-07-18",
+  "session" : "Evening",
+  "startTime" : [ 8, 0 ],
+  "endTime" : [ 9, 0 ]
 } ]
