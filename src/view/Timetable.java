@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,12 +16,14 @@ import javax.swing.SwingUtilities;
 
 import core.BookingEntry;
 import core.BookingManager;
+import core.CustomFontUtil;
 import core.JsonUpdateListener;
 
 import java.awt.Toolkit;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +38,8 @@ import java.awt.GridLayout;
 
 public class Timetable implements JsonUpdateListener{
     //Global identifiers
+    Font interMediumForEvents;
+    Font interLightForHeading;
     JPanel monthViewMainPanel;
     JPanel monthViewPanelDays;
     JPanel monthViewHeadingPanel;
@@ -43,8 +48,14 @@ public class Timetable implements JsonUpdateListener{
     BookingManager bookingManager = new BookingManager();
     List<BookingEntry> bookingList = new ArrayList<>();
     private final Map<String, String> subjectShortNames = new HashMap<>();
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H");
 
     Timetable(String name,String privilege){
+
+        //Custom fonts used within the application
+        interMediumForEvents = CustomFontUtil.loadFont("src/resources/fonts/Inter-Medium.otf", 12);
+        interLightForHeading = CustomFontUtil.loadFont("src/resources/fonts/Inter-Light.otf", 30);
+
         JFrame frame = new JFrame();
         frame.setTitle("TimeTable 2023 by Vishnu and Drushti");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,7 +126,7 @@ public class Timetable implements JsonUpdateListener{
 
         //monthPanel
         monthViewHeadingPanel = new JPanel(); // Holds the heading (like "July 2023") and date chooser.
-        monthViewHeadingPanel.setPreferredSize(new Dimension(0, 80));
+        monthViewHeadingPanel.setPreferredSize(new Dimension(0, 50));
         monthViewMainPanel = new JPanel(); // Holds the week headings and the total days of the month
         monthViewMainPanel.setLayout(new BorderLayout());
         monthPanel.add(monthViewHeadingPanel, BorderLayout.NORTH);
@@ -200,6 +211,7 @@ public class Timetable implements JsonUpdateListener{
 
         JPanel sidePanel = new JPanel();
         sidePanel.setPreferredSize(new Dimension(300, 0));
+        sidePanel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, new Color(216,216,216)));
         sidePanel.setBackground(new Color(0, 93, 170));
 
         //===================================================================>
@@ -264,6 +276,7 @@ public class Timetable implements JsonUpdateListener{
         JPanel monthYearHeading = new JPanel(new BorderLayout());
         JLabel monthYearLabel = new JLabel(yearMonth.getMonth().toString() + " " + yearMonth.getYear());
         monthYearLabel.setFont(new Font("Bitstream Charter",Font.PLAIN,34));
+        monthYearLabel.setFont(interLightForHeading);
         monthYearLabel.setHorizontalAlignment(JLabel.CENTER);
         monthYearHeading.add(monthYearLabel);
 
@@ -327,9 +340,10 @@ public class Timetable implements JsonUpdateListener{
             JLabel dayLabel = new JLabel(Integer.toString(i));
             dayLabelPanel.add(dayLabel);
 
-            //new code starts here
             JPanel dayEventsPanel = new JPanel(); // Holds the event details
             dayEventsPanel.setLayout(new BoxLayout(dayEventsPanel, BoxLayout.Y_AXIS));
+            dayEventsPanel.setBackground(Color.WHITE);
+            dayEventsPanel.setBorder(BorderFactory.createEmptyBorder(0,3,3,3));
 
             // Get the bookings for the current day
             LocalDate currentDate = LocalDate.of(yearMonth.getYear(), yearMonth.getMonthValue(), i);
@@ -353,15 +367,39 @@ public class Timetable implements JsonUpdateListener{
 
             for (BookingEntry booking : bookingsForDay) {
                 JPanel bookingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                //get the shortened code for the subject names
+                bookingPanel.setMinimumSize(new Dimension(0,15));
+                bookingPanel.setPreferredSize(new Dimension(0,18));
+                bookingPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 25));
+                //get the short forms for subjects, session, startTime and endTime
                 String subjectName = subjectShortNames.getOrDefault(booking.getSubject(), booking.getSubject());
-                bookingPanel.add(new JLabel(subjectName + " - " + booking.getStartTime().toString() + " - " + booking.getEndTime().toString()));
+                String session = booking.getSession();
+                String sessionShortForm = (session.equals("Forenoon")?"FN":(session.equals("Afternoon")?"AN":"EV"));
+                String startTimeStr = booking.getStartTime().format(timeFormatter);
+                String endTimeStr = booking.getEndTime().format(timeFormatter);
+                JLabel bookingLabel = new JLabel(subjectName + " : " + startTimeStr + " to " + endTimeStr + " " + sessionShortForm);
+                bookingLabel.setFont(interMediumForEvents);
+                bookingPanel.add(bookingLabel);
+
+                // Background colour of events
+                if(booking.getSession().equals("Forenoon")){
+                    bookingLabel.setForeground(new Color(60, 80, 43));
+                    bookingPanel.setBackground(new Color(217, 237, 200));
+                }
+                else if(booking.getSession().equals("Afternoon")){
+                    bookingLabel.setForeground(new Color(60, 62, 159));
+                    bookingPanel.setBackground(new Color(230, 230, 255));
+                }
+                else{
+                    bookingLabel.setForeground(new Color(105, 46, 39));
+                    bookingPanel.setBackground(new Color(253, 206, 200));
+                }
                 dayEventsPanel.add(bookingPanel);
+                dayEventsPanel.add(Box.createRigidArea(new Dimension(0, 3)));
             }
 
             if (yearMonth.getMonthValue() == LocalDate.now().getMonthValue() && i == LocalDate.now().getDayOfMonth() && yearMonth.getYear() == LocalDate.now().getYear()) {
-                dayLabel.setForeground(Color.RED);
-                dayPanel.setBackground(new Color(230,230,230));
+                dayLabel.setForeground(Color.BLACK);
+                dayLabelPanel.setBackground(new Color(231, 241, 249)); // edit the colour
             }
 
             dayPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(216,216,216)));
