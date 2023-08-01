@@ -18,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -156,10 +157,12 @@ public class BookSlot {
             if(isSlotAvailable(bookingEntry, bookDialog)){
                 BookingManager bookingManager = new BookingManager();
                 bookingManager.createBookingEntry(bookingEntry);
-                callback.updateCalendarView();
+                callback.updateCalendarView(bookingDate);
 
-                // Show the option pane only after successfull booking.
-                JOptionPane.showMessageDialog(bookDialog, "Slot Booked Succesfully", "Booking Status", JOptionPane.INFORMATION_MESSAGE);
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(bookDialog, "Slot Booked Succesfully", "Booking Status", JOptionPane.INFORMATION_MESSAGE);
+                });
+                
             }
         });
 
@@ -194,7 +197,9 @@ public class BookSlot {
                     //Message to be displayed when slot is not available
                     String message = "Sorry, The slot is already taken by " + booking.getFacultyName() + " From " + booking.getStartTime().toString() + " to " + booking.getEndTime().toString() + ".";
 
-                    JOptionPane.showMessageDialog(parent, message, "Booking Status", JOptionPane.ERROR_MESSAGE);
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(parent, message, "Booking Status", JOptionPane.ERROR_MESSAGE);
+                    });
                     return false; // Slot is not available
                 }
             }

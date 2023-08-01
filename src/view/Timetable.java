@@ -24,37 +24,59 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 
 public class Timetable implements JsonUpdateListener{
-    //Global identifiers
+    // Global Identifiers ===================================================>
+    // Fonts
     Font interMediumForEvents;
     Font interLightForHeading;
+    Font sidePanelWeekDayFont;
+    Font sidePanelDateFont;
+    Font sidePanelHeadingFont;
+    Font sidePanelHeadings;
+    Font sidePanelSubjectFacultyFont;
+    // MonthPanel
     JPanel monthViewMainPanel;
     JPanel monthViewPanelDays;
     JPanel monthViewHeadingPanel;
     static JComboBox<String> monthComboBox;
     static JComboBox<Integer> yearComboBox;
+    // Side Panel
+    JPanel sidePanel;
+    JLabel sidePanelDateLabel;
+    // Miscellaneous
     BookingManager bookingManager = new BookingManager();
     List<BookingEntry> bookingList = new ArrayList<>();
     private final Map<String, String> subjectShortNames = new HashMap<>();
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H");
+    DateTimeFormatter sidePanelTimeFormatter = DateTimeFormatter.ofPattern("H:mm");
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
+
+    //=======================================================================>
 
     Timetable(String name,String privilege){
 
         //Custom fonts used within the application
         interMediumForEvents = CustomFontUtil.loadFont("src/resources/fonts/Inter-Medium.otf", 12);
         interLightForHeading = CustomFontUtil.loadFont("src/resources/fonts/Inter-Light.otf", 30);
+        sidePanelWeekDayFont = CustomFontUtil.loadFont("src/resources/fonts/Inter-Light.otf", 30);
+        sidePanelDateFont = CustomFontUtil.loadFont("src/resources/fonts/Inter-Medium.otf", 15);
+        sidePanelHeadingFont = CustomFontUtil.loadFont("src/resources/fonts/Inter-Bold.otf", 13);
+        sidePanelSubjectFacultyFont = CustomFontUtil.loadFont("src/resources/fonts/Inter-SemiBold.otf", 13);
 
         JFrame frame = new JFrame();
         frame.setTitle("TimeTable 2023 by Vishnu and Drushti");
@@ -65,7 +87,7 @@ public class Timetable implements JsonUpdateListener{
         subjectShortNames.put("Computer Networks", "CN");
         subjectShortNames.put("Programming Paradigms", "PP");
         subjectShortNames.put("Computer Architecture", "CA");
-        subjectShortNames.put("Mathematical Foundations of CS", "MF");
+        subjectShortNames.put("Mathematical Foundns of CS", "MF");
         subjectShortNames.put("Data Structures & Algorithms", "DS");
 
         // MenuBar =========================================================>
@@ -209,10 +231,16 @@ public class Timetable implements JsonUpdateListener{
 
         // SidePanel ========================================================>
 
-        JPanel sidePanel = new JPanel();
+        sidePanel = new JPanel();
         sidePanel.setPreferredSize(new Dimension(300, 0));
-        sidePanel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, new Color(216,216,216)));
-        sidePanel.setBackground(new Color(0, 93, 170));
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
+        sidePanel.setBackground(Color.WHITE); // Backup color: new Color(0, 93, 170)
+        sidePanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 2, 0, 0, new Color(216, 216, 216)),
+            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+
+        updateSidePanel(LocalDate.now());
 
         //===================================================================>
 
@@ -256,6 +284,142 @@ public class Timetable implements JsonUpdateListener{
         frame.add(sidePanel,BorderLayout.EAST);
         
         frame.setVisible(true);
+    }
+
+    private void updateSidePanel(LocalDate currentDate) {
+        sidePanel.removeAll();
+
+        String weekDay = currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
+        JLabel sidePanelWeekDayLabel = new JLabel(weekDay);
+        sidePanelWeekDayLabel.setFont(sidePanelWeekDayFont);
+
+        String formattedDate = currentDate.format(dateFormatter);
+        sidePanelDateLabel = new JLabel(formattedDate);
+        sidePanelDateLabel.setFont(sidePanelDateFont);
+
+        sidePanelWeekDayLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        sidePanelDateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        sidePanel.add(sidePanelWeekDayLabel);
+        sidePanel.add(sidePanelDateLabel);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        updateCurrentDayEvents(currentDate);
+        sidePanel.add(Box.createRigidArea(new Dimension(0,25)));
+        updateNextWeekEvents(currentDate);
+
+        sidePanel.revalidate();
+        sidePanel.repaint();
+    }
+
+    private void updateCurrentDayEvents(LocalDate currentDate) {
+        JLabel todayLabel = new JLabel("Today");
+        todayLabel.setFont(sidePanelHeadingFont);
+        todayLabel.setForeground(new Color(85, 85, 85));
+        todayLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        sidePanel.add(todayLabel);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 7)));
+
+        JPanel currentDayEventPanel = new JPanel();
+        currentDayEventPanel.setLayout(new BoxLayout(currentDayEventPanel, BoxLayout.PAGE_AXIS));
+        currentDayEventPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        currentDayEventPanel.setBackground(Color.WHITE);
+
+        List<BookingEntry> bookingsForDay = getBookingsForDay(currentDate);
+
+        for (BookingEntry booking : bookingsForDay) {
+            JPanel bookingPanel = new JPanel();
+            bookingPanel.setLayout(new BoxLayout(bookingPanel, BoxLayout.PAGE_AXIS));
+            bookingPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            setSidePanelBookingPanelDimensions(bookingPanel);
+            
+            String startTimeStr = booking.getStartTime().format(sidePanelTimeFormatter);
+            String endTimeStr = booking.getEndTime().format(sidePanelTimeFormatter);
+            JLabel eventSubjectFacultyLabel = new JLabel(booking.getSubject() + " - " + booking.getFacultyName());
+            JLabel eventSessionTimeLabel = new JLabel(booking.getSession() + " - " + startTimeStr + " to " + endTimeStr);
+            eventSubjectFacultyLabel.setFont(sidePanelSubjectFacultyFont);
+            eventSessionTimeLabel.setFont(interMediumForEvents);
+            bookingPanel.add(eventSubjectFacultyLabel);
+            bookingPanel.add(eventSessionTimeLabel);
+
+            setSidePanelBookingPanelColors(booking, eventSubjectFacultyLabel, eventSessionTimeLabel, bookingPanel);
+
+            bookingPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            currentDayEventPanel.add(bookingPanel);
+            currentDayEventPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+        sidePanel.add(currentDayEventPanel);
+    }
+
+    private void updateNextWeekEvents(LocalDate sidePanelDate) {
+        JLabel nextWeekLabel = new JLabel("Next Week");
+        nextWeekLabel.setFont(sidePanelHeadingFont);
+        nextWeekLabel.setForeground(new Color(85, 85, 85));
+        nextWeekLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        sidePanel.add(nextWeekLabel);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 7)));
+
+        JPanel nextWeekEventPanel = new JPanel();
+        nextWeekEventPanel.setLayout(new BoxLayout(nextWeekEventPanel, BoxLayout.PAGE_AXIS));
+        nextWeekEventPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        nextWeekEventPanel.setBackground(Color.WHITE);
+
+        for (int i = 1; i <= 6; i++) {
+            LocalDate currentDate = sidePanelDate.plusDays(i);
+
+            List<BookingEntry> bookingsForDay = getBookingsForDay(currentDate);
+
+            for (BookingEntry booking : bookingsForDay) {
+                JPanel bookingPanel = new JPanel();
+                bookingPanel.setLayout(new BoxLayout(bookingPanel, BoxLayout.PAGE_AXIS));
+                bookingPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+                setSidePanelBookingPanelDimensions(bookingPanel);
+                
+                String startTimeStr = booking.getStartTime().format(sidePanelTimeFormatter);
+                String endTimeStr = booking.getEndTime().format(sidePanelTimeFormatter);
+                String weekDayStr = booking.getDate().format(DateTimeFormatter.ofPattern("E, MMM d"));
+                JLabel eventSubjectFacultyLabel = new JLabel(booking.getSubject() + " - " + booking.getFacultyName());
+                JLabel eventSessionTimeLabel = new JLabel(weekDayStr + " : " + booking.getSession() + " - " + startTimeStr + " to " + endTimeStr);
+                eventSubjectFacultyLabel.setFont(sidePanelSubjectFacultyFont);
+                eventSessionTimeLabel.setFont(interMediumForEvents);
+                bookingPanel.add(eventSubjectFacultyLabel);
+                bookingPanel.add(eventSessionTimeLabel);
+
+                setSidePanelBookingPanelColors(booking, eventSubjectFacultyLabel, eventSessionTimeLabel, bookingPanel);
+
+                bookingPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                nextWeekEventPanel.add(bookingPanel);
+                nextWeekEventPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            }
+        }
+        sidePanel.add(nextWeekEventPanel);
+    }
+
+    private void setSidePanelBookingPanelDimensions(JPanel bookingPanel) {
+        bookingPanel.setMinimumSize(new Dimension(270,50));
+        bookingPanel.setPreferredSize(new Dimension(270,55));
+        bookingPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 55));
+    }
+
+    private void setSidePanelBookingPanelColors(BookingEntry booking, JLabel subjectLabel, JLabel timeLabel, JPanel bookingPanel) {
+        if(booking.getSession().equals("Forenoon")){
+            subjectLabel.setForeground(new Color(60, 80, 43));
+            timeLabel.setForeground(new Color(60, 80, 43));
+            bookingPanel.setBackground(new Color(217, 237, 200));
+        }
+        else if(booking.getSession().equals("Afternoon")){
+            subjectLabel.setForeground(new Color(60, 62, 159));
+            timeLabel.setForeground(new Color(60, 62, 159));
+            bookingPanel.setBackground(new Color(230, 230, 255));
+        }
+        else{
+            subjectLabel.setForeground(new Color(105, 46, 39));
+            timeLabel.setForeground(new Color(105, 46, 39));
+            bookingPanel.setBackground(new Color(253, 206, 200));
+        }
     }
 
     private void updateMonthPanel(LocalDate date) {
@@ -334,11 +498,17 @@ public class Timetable implements JsonUpdateListener{
         for (int i = 1; i <= numberOfDays; i++) {
             JPanel dayPanel = new JPanel();
             dayPanel.setLayout(new BorderLayout());
+            dayPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(216,216,216)));
 
             JPanel dayLabelPanel = new JPanel(); // Holds the day number.
             dayLabelPanel.setBackground(Color.WHITE);
             JLabel dayLabel = new JLabel(Integer.toString(i));
             dayLabelPanel.add(dayLabel);
+
+            if (yearMonth.getMonthValue() == LocalDate.now().getMonthValue() && i == LocalDate.now().getDayOfMonth() && yearMonth.getYear() == LocalDate.now().getYear()) {
+                dayLabel.setForeground(new Color(0, 93, 170));
+                dayPanel.setBorder(BorderFactory.createMatteBorder(4, 0, 0, 0, new Color(0, 93, 170)));
+            }
 
             JPanel dayEventsPanel = new JPanel(); // Holds the event details
             dayEventsPanel.setLayout(new BoxLayout(dayEventsPanel, BoxLayout.Y_AXIS));
@@ -348,22 +518,6 @@ public class Timetable implements JsonUpdateListener{
             // Get the bookings for the current day
             LocalDate currentDate = LocalDate.of(yearMonth.getYear(), yearMonth.getMonthValue(), i);
             List<BookingEntry> bookingsForDay = getBookingsForDay(currentDate);
-
-            // Sort the bookings first by session (forenoon -> afternoon -> evening) and then by startTime
-            bookingsForDay.sort((b1, b2) -> {
-                String session1 = b1.getSession();
-                String session2 = b2.getSession();
-                int sessionOrder1 = getSessionOrder(session1);
-                int sessionOrder2 = getSessionOrder(session2);
-
-                if (sessionOrder1 != sessionOrder2) {
-                    return Integer.compare(sessionOrder1, sessionOrder2);
-                }
-
-                LocalTime startTime1 = b1.getStartTime();
-                LocalTime startTime2 = b2.getStartTime();
-                return startTime1.compareTo(startTime2);
-            });
 
             for (BookingEntry booking : bookingsForDay) {
                 JPanel bookingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -397,12 +551,6 @@ public class Timetable implements JsonUpdateListener{
                 dayEventsPanel.add(Box.createRigidArea(new Dimension(0, 3)));
             }
 
-            if (yearMonth.getMonthValue() == LocalDate.now().getMonthValue() && i == LocalDate.now().getDayOfMonth() && yearMonth.getYear() == LocalDate.now().getYear()) {
-                dayLabel.setForeground(Color.BLACK);
-                dayLabelPanel.setBackground(new Color(231, 241, 249)); // edit the colour
-            }
-
-            dayPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(216,216,216)));
             dayPanel.add(dayLabelPanel, BorderLayout.NORTH);
             dayPanel.add(dayEventsPanel, BorderLayout.CENTER);
             monthViewPanelDays.add(dayPanel);
@@ -419,6 +567,22 @@ public class Timetable implements JsonUpdateListener{
                 bookingsForDay.add(booking);
             }
         }
+        // Sort the bookings first by session (forenoon -> afternoon -> evening) and then by startTime
+            bookingsForDay.sort((b1, b2) -> {
+                String session1 = b1.getSession();
+                String session2 = b2.getSession();
+                int sessionOrder1 = getSessionOrder(session1);
+                int sessionOrder2 = getSessionOrder(session2);
+
+                if (sessionOrder1 != sessionOrder2) {
+                    return Integer.compare(sessionOrder1, sessionOrder2);
+                }
+
+                LocalTime startTime1 = b1.getStartTime();
+                LocalTime startTime2 = b2.getStartTime();
+                return startTime1.compareTo(startTime2);
+            });
+
         return bookingsForDay;
     }
 
@@ -446,10 +610,17 @@ public class Timetable implements JsonUpdateListener{
 
     // Method used as a callback to update the calendar view after slot booking/deletion.
     @Override
-    public void updateCalendarView() {
-        LocalDate newDate = LocalDate.of((int)yearComboBox.getSelectedItem(),monthComboBox.getSelectedIndex()+1,1);
-        YearMonth yearMonth = YearMonth.from(newDate);
-        updateMonthViewDaysPanel(yearMonth);
+    public void updateCalendarView(LocalDate selectedDate) {
+        YearMonth yearMonth = YearMonth.of((int)yearComboBox.getSelectedItem(), (int)monthComboBox.getSelectedIndex()+1);
+        // If the booking/deleting YearMonth is the same YearMonth shown in calendarView
+        if(yearMonth.equals(YearMonth.from(selectedDate))){
+            updateMonthViewDaysPanel(yearMonth);
+        }
+
+        LocalDate sidePanelDate = LocalDate.parse(sidePanelDateLabel.getText(), dateFormatter);
+        if(!selectedDate.isBefore(sidePanelDate) && !selectedDate.isAfter(sidePanelDate.plusDays(6))){
+            updateSidePanel(sidePanelDate);
+        }
     } 
 
 }

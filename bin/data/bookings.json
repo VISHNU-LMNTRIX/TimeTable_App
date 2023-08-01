@@ -7,7 +7,7 @@
   "endTime" : [ 9, 0 ]
 }, {
   "facultyName" : "Athul",
-  "subject" : "Mathematical Foundations of CS",
+  "subject" : "Mathematical Foundns of CS",
   "date" : "2023-07-19",
   "session" : "Afternoon",
   "startTime" : [ 2, 0 ],
@@ -61,4 +61,39 @@
   "session" : "Afternoon",
   "startTime" : [ 2, 0 ],
   "endTime" : [ 5, 0 ]
+}, {
+  "facultyName" : "Liji",
+  "subject" : "Computer Architecture",
+  "date" : "2023-08-01",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 12, 0 ]
+}, {
+  "facultyName" : "Liji",
+  "subject" : "Computer Networks",
+  "date" : "2023-08-01",
+  "session" : "Afternoon",
+  "startTime" : [ 2, 0 ],
+  "endTime" : [ 5, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-08-15",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 12, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-08-05",
+  "session" : "Evening",
+  "startTime" : [ 6, 0 ],
+  "endTime" : [ 9, 0 ]
+}, {
+  "facultyName" : "Athul",
+  "subject" : "Mathematical Foundns of CS",
+  "date" : "2023-08-04",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 12, 0 ]
 } ]

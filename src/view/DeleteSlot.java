@@ -20,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,22 +117,27 @@ public class DeleteSlot {
         submit.addActionListener(e -> {
             //If there are no slots booked
             if((String)dateComboBox.getSelectedItem() == null){
-                JOptionPane.showMessageDialog(deleteDialog, "The Slot Is Already Empty.", "Deletion Status", JOptionPane.WARNING_MESSAGE);
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(deleteDialog, "The Slot Is Already Empty.", "Deletion Status", JOptionPane.WARNING_MESSAGE);
+                });
             }
             else {
                 //StringTokenizer is used to seperate the time from the string obtained from timeComboBox, which contains string like "09:00 to 10:00" .The seperated strings can be accessed using .nextToken() method.
                 StringTokenizer timeString = new StringTokenizer((String)timeComboBox.getSelectedItem()," to ");
                 LocalTime startTime = LocalTime.parse(timeString.nextToken());
                 LocalTime endTime = LocalTime.parse(timeString.nextToken());
+                LocalDate deleteDate = LocalDate.parse((String)dateComboBox.getSelectedItem(), formatter);
 
-                bookingManager.deleteBookingEntry((String)nameComboBox.getSelectedItem(), LocalDate.parse((String)dateComboBox.getSelectedItem(), formatter), startTime, endTime);
+                bookingManager.deleteBookingEntry((String)nameComboBox.getSelectedItem(), deleteDate, startTime, endTime);
 
                 bookingList = bookingManager.readBookingData();
                 updateDateComboBox();
                 updateTimeComboBox();
-                callback.updateCalendarView(); //Updates the calendar view after deleting a slot
+                callback.updateCalendarView(deleteDate); //Updates the calendar view after deleting a slot
                 
-                JOptionPane.showMessageDialog(deleteDialog, "Slot Deleted Succesfully", "Deletion Status", JOptionPane.INFORMATION_MESSAGE);
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(deleteDialog, "Slot Deleted Succesfully", "Deletion Status", JOptionPane.INFORMATION_MESSAGE);
+                });
             }
         });
 
