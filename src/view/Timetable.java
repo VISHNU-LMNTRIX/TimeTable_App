@@ -15,12 +15,16 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import java.awt.event.MouseEvent;
+
+
 import core.BookingEntry;
 import core.BookingManager;
 import core.CustomFontUtil;
 import core.JsonUpdateListener;
 
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -317,7 +321,7 @@ public class Timetable implements JsonUpdateListener{
     }
 
     private void updateCurrentDayEvents(LocalDate currentDate) {
-        JLabel todayLabel = new JLabel("Today");
+        JLabel todayLabel = new JLabel("Events of the day");
         todayLabel.setFont(sidePanelHeadingFont);
         todayLabel.setForeground(new Color(85, 85, 85));
         todayLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -559,6 +563,29 @@ public class Timetable implements JsonUpdateListener{
             dayPanel.add(dayLabelPanel, BorderLayout.NORTH);
             dayPanel.add(dayEventsPanel, BorderLayout.CENTER);
             monthViewPanelDays.add(dayPanel);
+
+            // Event Listeners for dayPanel
+            dayPanel.addMouseListener(new MouseAdapter() {
+                private Color originalBackgroundColor = dayLabelPanel.getBackground();
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    dayLabelPanel.setBackground(new Color(238, 238, 238));
+                    dayEventsPanel.setBackground(new Color(238, 238, 238));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    dayLabelPanel.setBackground(originalBackgroundColor);
+                    dayEventsPanel.setBackground(originalBackgroundColor);
+                }
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int day = Integer.parseInt(dayLabel.getText());
+                    updateSidePanel(yearMonth.atDay(day));
+                }
+            });
         }
         monthViewPanelDays.revalidate();
         monthViewPanelDays.repaint();

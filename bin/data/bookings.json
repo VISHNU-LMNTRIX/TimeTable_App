@@ -118,10 +118,17 @@
   "startTime" : [ 9, 0 ],
   "endTime" : [ 12, 0 ]
 }, {
-  "facultyName" : "Athul",
-  "subject" : "Mathematical Foundns of CS",
-  "date" : "2023-08-18",
+  "facultyName" : "Lekshmi",
+  "subject" : "Data Structures & Algorithms",
+  "date" : "2023-08-13",
   "session" : "Afternoon",
   "startTime" : [ 2, 0 ],
-  "endTime" : [ 6, 0 ]
+  "endTime" : [ 5, 0 ]
+}, {
+  "facultyName" : "Liji",
+  "subject" : "Computer Architecture",
+  "date" : "2023-08-13",
+  "session" : "Evening",
+  "startTime" : [ 7, 0 ],
+  "endTime" : [ 9, 0 ]
 } ]
