@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -276,6 +277,10 @@ public class Timetable implements JsonUpdateListener{
 
         viewMenuItemDay.addActionListener(e -> {
             cardLayoutObject.show(calendarPanel, "dayPanel");
+        });
+
+        helpMenuItemAbout.addActionListener(e -> {
+            JOptionPane.showMessageDialog(frame, "Streamlined Scheduling Made Easy: A Brainchild of Vishnu Prasad and Drushti.\n\nWelcome to a smarter way of managing timetables. Our application empowers faculties to book and     \nadapt slots based on their availability, fostering a dynamic scheduling environment. Students gain\ninsight into booked slots and associated subjects, facilitating better planning and collaboration.\n\n", "About", JOptionPane.INFORMATION_MESSAGE);
         });
 
         // Add components to frame
