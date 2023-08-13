@@ -233,13 +233,26 @@ public class BookSlot {
 
     //Function to update the no:of days when month/year is changed.
     private void updateNoOfDays() {
+        Object selectedItem = dayComboBox.getSelectedItem();
+        int selectedDay = selectedItem != null ? (int) selectedItem : 1;
         dayComboBox.removeAllItems();
-        int year = (Integer)yearComboBox.getSelectedItem();
+        int year = (Integer) yearComboBox.getSelectedItem();
         int month = monthComboBox.getSelectedIndex() + 1;
         YearMonth yearMonth = YearMonth.of(year, month);
         int daysInMonth = yearMonth.lengthOfMonth();
-        for(int day = 1; day<= daysInMonth; day++){
+    
+        for (int day = 1; day <= daysInMonth; day++) {
             dayComboBox.addItem(day);
         }
+    
+        // Check if the year and month match the current year and month
+        if (year == LocalDate.now().getYear() && month == LocalDate.now().getMonthValue()) {
+            dayComboBox.setSelectedItem(LocalDate.now().getDayOfMonth());
+        }
+
+        if(selectedDay != 1){
+            dayComboBox.setSelectedItem(selectedDay);
+        }
     }
+    
 }

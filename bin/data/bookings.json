@@ -1,11 +1,4 @@
 [ {
-  "facultyName" : "Lekshmi",
-  "subject" : "Data Structures & Algorithms",
-  "date" : "2023-07-22",
-  "session" : "Evening",
-  "startTime" : [ 7, 0 ],
-  "endTime" : [ 9, 0 ]
-}, {
   "facultyName" : "Athul",
   "subject" : "Mathematical Foundns of CS",
   "date" : "2023-07-19",

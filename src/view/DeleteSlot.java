@@ -11,7 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JButton;
@@ -153,10 +155,19 @@ public class DeleteSlot {
     private void updateDateComboBox() {
         dateComboBox.removeAllItems();
         String facultyName = (String)nameComboBox.getSelectedItem();
+
+        // Create a set to keep track of unique date strings
+        Set<String> uniqueDateStrings = new HashSet<>();
+
         for(BookingEntry booking : bookingList){
             if(booking.getFacultyName().equals(facultyName)){
                 String dateString = booking.getDate().format(formatter);
-                dateComboBox.addItem(dateString);
+                
+                // Check if the date string is not already in the set before adding it
+                if (!uniqueDateStrings.contains(dateString)) {
+                    uniqueDateStrings.add(dateString);
+                    dateComboBox.addItem(dateString);
+                }
             }
         }
     }

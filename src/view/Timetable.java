@@ -123,7 +123,9 @@ public class Timetable implements JsonUpdateListener{
 
         menuBar.add(fileMenu);
         menuBar.add(viewMenu);
-        menuBar.add(toolsMenu);
+        if(privilege.equals("admin") || privilege.equals("moderator")){
+            menuBar.add(toolsMenu);
+        }
         menuBar.add(helpMenu);
 
         menuBar.setPreferredSize(new Dimension(1100,20));
