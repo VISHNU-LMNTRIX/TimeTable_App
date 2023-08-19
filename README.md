@@ -1,6 +1,10 @@
+## Objective
+
+Develop a timetable application designed to assist in scheduling and managing time slots for college faculties and students. Faculties should be able to easily schedule and manage class time slots on specific days according to their preferences. Meanwhile, students should have the capability to view the finalized timetable and plan their activities accordingly.
+
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+This project is written in Visual Studio Code. So this project contains VS_Code specific configuration files. 
 
 ## Folder Structure
 
