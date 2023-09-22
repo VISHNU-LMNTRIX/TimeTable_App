@@ -225,7 +225,7 @@ public class Timetable implements JsonUpdateListener{
 
             updateSlotBtn.addActionListener(e -> {
                 SwingUtilities.invokeLater(() -> {
-                    new UpdateSlot(frame, name, privilege);
+                    new UpdateSlot(frame, name, privilege, this);
                 });
             });
 

@@ -49,25 +49,6 @@ public class BookingManager {
         }
     }
 
-    public void modifyBookingEntry(String facultyName, LocalDate date, LocalTime startTime, LocalTime endTime, LocalTime newStartTime, LocalTime newEndTime) {
-        List<BookingEntry> bookings = readBookingsFromFile();
-        boolean found = false;
-        for (BookingEntry bookingEntry : bookings) {
-            if (bookingEntry.getFacultyName().equals(facultyName) && bookingEntry.getDate().equals(date) &&
-                    bookingEntry.getStartTime().equals(startTime) && bookingEntry.getEndTime().equals(endTime)) {
-                bookingEntry.setStartTime(newStartTime);
-                bookingEntry.setEndTime(newEndTime);
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            saveBookingsToFile(bookings);
-        } else {
-            System.out.println("No object found");
-        }
-    }
-
     private List<BookingEntry> readBookingsFromFile() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {

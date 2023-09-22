@@ -75,7 +75,7 @@ public class BookSlot {
         nameComboBox.setBounds(155,40,175,25);
         if(privilege.equals("admin")){
             for(Faculty faculty : facultyList){
-            nameComboBox.addItem(faculty.getName());
+                nameComboBox.addItem(faculty.getName());
             }
         }
         else if(privilege.equals("moderator")){ // "else" not used because different privileges can be added later
@@ -178,12 +178,12 @@ public class BookSlot {
             updateStartandEndTime();
         });
 
-         // Calculate the center coordinates
+        // Calculate the center coordinates
         int centerX = parent.getX() + (parent.getWidth() - bookDialog.getWidth()) / 2;
         int centerY = parent.getY() + (parent.getHeight() - bookDialog.getHeight()) / 2;
  
-         bookDialog.setLocation(centerX, centerY);  // Set the window location
-         bookDialog.setVisible(true);
+        bookDialog.setLocation(centerX, centerY);  // Set the window location
+        bookDialog.setVisible(true);
     }
 
     private boolean isSlotAvailable(BookingEntry newBooking, Component parent) {

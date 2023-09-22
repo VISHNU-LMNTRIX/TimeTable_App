@@ -143,13 +143,13 @@ public class DeleteSlot {
             }
         });
 
-         // Calculate the center coordinates
-         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-         int centerX = (int) (screenSize.getWidth() - deleteDialog.getWidth()) / 2;
-         int centerY = (int) (screenSize.getHeight() - deleteDialog.getHeight()) / 2;
- 
-         deleteDialog.setLocation(centerX, centerY);  // Set the window location
-         deleteDialog.setVisible(true);
+        // Calculate the center coordinates
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int centerX = (int) (screenSize.getWidth() - deleteDialog.getWidth()) / 2;
+        int centerY = (int) (screenSize.getHeight() - deleteDialog.getHeight()) / 2;
+
+        deleteDialog.setLocation(centerX, centerY);  // Set the window location
+        deleteDialog.setVisible(true);
     }
 
     private void updateDateComboBox() {
