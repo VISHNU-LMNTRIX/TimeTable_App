@@ -109,8 +109,8 @@ public class Login {
                 //call TimeTable and pass the name and privilege
                 SwingUtilities.invokeLater(() -> {
                     new Timetable(selectedName, faculty.getPrivilege());
+                    frame.dispose();
                 });
-                frame.dispose();
                 return;
 
             }
@@ -125,7 +125,7 @@ public class Login {
     private void onBack(){
         SwingUtilities.invokeLater(() -> {
             new Welcome();
+            frame.dispose();
         });
-        frame.dispose();
     }
 }

@@ -187,7 +187,7 @@ public class UpdateSlot {
                 String subject = "";
                 bookingList = bookingManager.readBookingData();
                 for (BookingEntry bookingEntry : bookingList) {
-                    if (bookingEntry.getFacultyName().equals(facultyName) && bookingEntry.getDate().equals(deleteDate) && bookingEntry.getStartTime().equals(startTime) && bookingEntry.getEndTime().equals(endTime)) {
+                    if (bookingEntry.getFacultyName().equals((String)nameComboBox.getSelectedItem()) && bookingEntry.getDate().equals(deleteDate) && bookingEntry.getStartTime().equals(startTime) && bookingEntry.getEndTime().equals(endTime)) {
                         subject = bookingEntry.getSubject();
                         break;
                     }

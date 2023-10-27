@@ -166,4 +166,39 @@
   "session" : "Afternoon",
   "startTime" : [ 2, 0 ],
   "endTime" : [ 5, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-10-28",
+  "session" : "Forenoon",
+  "startTime" : [ 9, 0 ],
+  "endTime" : [ 10, 0 ]
+}, {
+  "facultyName" : "Liji",
+  "subject" : "Computer Architecture",
+  "date" : "2023-10-29",
+  "session" : "Evening",
+  "startTime" : [ 7, 0 ],
+  "endTime" : [ 9, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Data Structures & Algorithms",
+  "date" : "2023-10-28",
+  "session" : "Afternoon",
+  "startTime" : [ 2, 0 ],
+  "endTime" : [ 5, 0 ]
+}, {
+  "facultyName" : "Arya",
+  "subject" : "Programming Paradigms",
+  "date" : "2023-10-27",
+  "session" : "Evening",
+  "startTime" : [ 7, 0 ],
+  "endTime" : [ 10, 0 ]
+}, {
+  "facultyName" : "Lekshmi",
+  "subject" : "Computer Networks",
+  "date" : "2023-10-31",
+  "session" : "Evening",
+  "startTime" : [ 6, 0 ],
+  "endTime" : [ 9, 0 ]
 } ]

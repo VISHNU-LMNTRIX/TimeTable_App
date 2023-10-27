@@ -32,8 +32,8 @@ public class Welcome {
             System.out.println("Student logged in.");
             SwingUtilities.invokeLater(() -> {
                 new Timetable("Student", "none");
+                frame.dispose();
             });
-            frame.dispose();
         });
 
         // Action Listener for the facultyButton
@@ -41,8 +41,8 @@ public class Welcome {
             System.out.println("Faculty trying to login...");
             SwingUtilities.invokeLater(() -> {
                 new Login();
+                frame.dispose();
             });
-            frame.dispose();
         });
 
         // Calculate the center coordinates

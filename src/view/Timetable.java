@@ -264,8 +264,8 @@ public class Timetable implements JsonUpdateListener{
             System.out.println("Successfully Logged out.");
             SwingUtilities.invokeLater(() -> {
                 new Welcome();
+                frame.dispose();
             });
-            frame.dispose();
         });
 
         fileMenuItemExit.addActionListener(e -> {
