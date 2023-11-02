@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 
 import java.awt.event.MouseEvent;
 
-
 import core.BookingEntry;
 import core.BookingManager;
 import core.CustomFontUtil;
@@ -99,33 +98,17 @@ public class Timetable implements JsonUpdateListener{
 
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
-        JMenu viewMenu = new JMenu("View");
-        JMenu toolsMenu = new JMenu("Tools");
         JMenu helpMenu = new JMenu("Help");
         JMenuItem fileMenuItemLogout = new JMenuItem("Logout");
         JMenuItem fileMenuItemExit = new JMenuItem("Exit");
-        JMenuItem viewMenuItemDay = new JMenuItem("Day View");
-        JMenuItem viewMenuItemWeek = new JMenuItem("Week View");
-        JMenuItem viewMenuItemMonth = new JMenuItem("Month View");
-        JMenuItem toolsMenuItemGetReport = new JMenuItem("Get Report");
         JMenuItem helpMenuItemAbout = new JMenuItem("About");
 
         fileMenu.add(fileMenuItemLogout);
         fileMenu.add(fileMenuItemExit);
 
-        viewMenu.add(viewMenuItemDay);
-        viewMenu.add(viewMenuItemWeek);
-        viewMenu.add(viewMenuItemMonth);
-
-        toolsMenu.add(toolsMenuItemGetReport);
-
         helpMenu.add(helpMenuItemAbout);
 
         menuBar.add(fileMenu);
-        menuBar.add(viewMenu);
-        if(privilege.equals("admin") || privilege.equals("moderator")){
-            menuBar.add(toolsMenu);
-        }
         menuBar.add(helpMenu);
 
         menuBar.setPreferredSize(new Dimension(1100,20));
@@ -140,14 +123,8 @@ public class Timetable implements JsonUpdateListener{
         JPanel calendarPanel = new JPanel();
         CardLayout cardLayoutObject = new CardLayout();
         calendarPanel.setLayout(cardLayoutObject);
-        JPanel dayPanel = new JPanel();
-        JPanel weekPanel = new JPanel();
         JPanel monthPanel = new JPanel();
-        dayPanel.setLayout(new BorderLayout());
-        weekPanel.setLayout(new BorderLayout());
         monthPanel.setLayout(new BorderLayout());
-        calendarPanel.add(dayPanel, "dayPanel");
-        calendarPanel.add(weekPanel, "weekPanel");
         calendarPanel.add(monthPanel, "monthPanel");
         // default view of calendarPanel
         cardLayoutObject.show(calendarPanel, "monthPanel");
@@ -241,13 +218,16 @@ public class Timetable implements JsonUpdateListener{
         sidePanel = new JPanel();
         sidePanel.setPreferredSize(new Dimension(300, 0));
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.PAGE_AXIS));
-        sidePanel.setBackground(Color.WHITE); // Backup color: new Color(0, 93, 170)
+        sidePanel.setBackground(Color.WHITE);
         sidePanel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 2, 0, 0, new Color(216, 216, 216)),
             BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
-        updateSidePanel(LocalDate.now());
+        SwingUtilities.invokeLater(() -> {
+            updateSidePanel(LocalDate.now());
+        });
+        
 
         //===================================================================>
 
@@ -261,7 +241,6 @@ public class Timetable implements JsonUpdateListener{
 
         //-------MenuBar
         fileMenuItemLogout.addActionListener(e -> {
-            System.out.println("Successfully Logged out.");
             SwingUtilities.invokeLater(() -> {
                 new Welcome();
                 frame.dispose();
@@ -269,20 +248,7 @@ public class Timetable implements JsonUpdateListener{
         });
 
         fileMenuItemExit.addActionListener(e -> {
-            System.out.println("Exiting out of Application");
             System.exit(0);
-        });
-
-        viewMenuItemMonth.addActionListener(e -> {
-            cardLayoutObject.show(calendarPanel, "monthPanel");
-        });
-
-        viewMenuItemWeek.addActionListener(e -> {
-            cardLayoutObject.show(calendarPanel, "weekPanel");
-        });
-
-        viewMenuItemDay.addActionListener(e -> {
-            cardLayoutObject.show(calendarPanel, "dayPanel");
         });
 
         helpMenuItemAbout.addActionListener(e -> {
@@ -293,17 +259,18 @@ public class Timetable implements JsonUpdateListener{
         frame.setJMenuBar(menuBar);
         frame.add(mainPanel,BorderLayout.CENTER);
         frame.add(sidePanel,BorderLayout.EAST);
-        
         frame.setVisible(true);
     }
 
     private void updateSidePanel(LocalDate currentDate) {
         sidePanel.removeAll();
 
+        // Get the day of the week and display its full name
         String weekDay = currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
         JLabel sidePanelWeekDayLabel = new JLabel(weekDay);
         sidePanelWeekDayLabel.setFont(sidePanelWeekDayFont);
 
+        // Format the current date and display it
         String formattedDate = currentDate.format(dateFormatter);
         sidePanelDateLabel = new JLabel(formattedDate);
         sidePanelDateLabel.setFont(sidePanelDateFont);
@@ -642,19 +609,23 @@ public class Timetable implements JsonUpdateListener{
         return (Integer)yearComboBox.getSelectedItem();
     }
 
-    // Method used as a callback to update the calendar view after slot booking/deletion.
+    // Method used as a callback to update the calendar view after slot booking/updation/deletion.
     @Override
     public void updateCalendarView(LocalDate selectedDate) {
         YearMonth yearMonth = YearMonth.of((int)yearComboBox.getSelectedItem(), (int)monthComboBox.getSelectedIndex()+1);
         // If the booking/deleting YearMonth is the same YearMonth shown in calendarView
         if(yearMonth.equals(YearMonth.from(selectedDate))){
-            updateMonthViewDaysPanel(yearMonth);
+            SwingUtilities.invokeLater(() -> {
+                updateMonthViewDaysPanel(yearMonth);
+            });
         }
 
         LocalDate sidePanelDate = LocalDate.parse(sidePanelDateLabel.getText(), dateFormatter);
         if(!selectedDate.isBefore(sidePanelDate) && !selectedDate.isAfter(sidePanelDate.plusDays(6))){
-            updateSidePanel(sidePanelDate);
+            SwingUtilities.invokeLater(() -> {
+                updateSidePanel(sidePanelDate);
+            });
+            
         }
     } 
-
 }

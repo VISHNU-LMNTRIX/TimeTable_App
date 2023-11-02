@@ -105,7 +105,6 @@ public class Login {
 
         for(Faculty faculty : facultyList){
             if(faculty.getName().equals(selectedName) && faculty.getPassword().equals(password)){
-                System.out.println("Login Succesfull. :)");
                 //call TimeTable and pass the name and privilege
                 SwingUtilities.invokeLater(() -> {
                     new Timetable(selectedName, faculty.getPrivilege());
@@ -117,7 +116,6 @@ public class Login {
         }
 
         //Password doesn't match
-        System.out.println("Login Failed");
         passwordStatusLabel.setForeground(Color.RED);
         passwordStatusLabel.setText("Incorrect Password.");
     }

@@ -29,7 +29,6 @@ public class Welcome {
 
         // Action Listener for the studentButton
         studentButton.addActionListener(e -> {
-            System.out.println("Student logged in.");
             SwingUtilities.invokeLater(() -> {
                 new Timetable("Student", "none");
                 frame.dispose();
@@ -38,7 +37,6 @@ public class Welcome {
 
         // Action Listener for the facultyButton
         facultyButton.addActionListener(e -> {
-            System.out.println("Faculty trying to login...");
             SwingUtilities.invokeLater(() -> {
                 new Login();
                 frame.dispose();
@@ -50,8 +48,7 @@ public class Welcome {
         int centerX = (int) (screenSize.getWidth() - frame.getWidth()) / 2;
         int centerY = (int) (screenSize.getHeight() - frame.getHeight()) / 2;
 
-        
-        frame.setLocation(centerX, centerY); // Set the window location
+        frame.setLocation(centerX, centerY);
         frame.setVisible(true);
     }
     
